@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="fi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KuittiFlow</title>
+
+    <meta name="theme-color" content="#0b0f17" />
+
+    <!-- Tässä branchissa pidetään UI yhdessä tiedostossa, jotta testaus on nopeaa.
+       Kun flow on lukittu, voidaan erottaa styles.css:ään. -->
+    <style>
+        :root {
+            --bg0: #050711;
+            --bg1: #0b0f1a;
+            --card: rgba(255, 255, 255, .08);
+            --card2: rgba(255, 255, 255, .12);
+            --stroke: rgba(255, 255, 255, .10);
+            --text: #fff;
+            --muted: #9ca3af;
+            --muted2: #7c8496;
+            --accentA: #6dd5fa;
+            --accentB: #a78bfa;
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(180deg, var(--bg1), var(--bg0));
+            color: var(--text);
+        }
+
+        .app {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 78px
+        }
+
+        .topbar {
+            padding: 16px 14px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accentA), var(--accentB));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0b0f17;
+            font-weight: 900;
+        }
+
+        .brand-text h1 {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.2
+        }
+
+        .brand-text p {
+            margin: 2px 0 0;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 8px
+        }
+
+        .icon-btn {
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .06);
+            color: var(--text);
+            padding: 8px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .section {
+            display: none;
+            padding: 0 14px 14px
+        }
+
+        .section.active {
+            display: block
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            padding: 14px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 12px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 15px
+        }
+
+        .sub {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .kpi {
+            background: var(--card2);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .value {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 6px
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted2);
+            margin-top: 2px
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45
+        }
+
+        .spacer {
+            height: 10px
+        }
+
+        .btn-primary {
+            width: 100%;
+            border: 0;
+            border-radius: 16px;
+            padding: 14px 12px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #0b0f17;
+            background: linear-gradient(135deg, var(--accentA), var(--accentB));
+        }
+
+        .btn-secondary {
+            width: 100%;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid var(--stroke);
+            background: transparent;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .preview-img {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            display: block;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: rgba(255, 255, 255, .06);
+            gap: 10px;
+        }
+
+        .row .left {
+            min-width: 0
+        }
+
+        .row .shop {
+            font-weight: 800;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .row .date {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .row .amount {
+            font-weight: 900
+        }
+
+        .pill-row {
+            display: flex;
+            gap: 8px
+        }
+
+        .pill {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, .04);
+            user-select: none;
+        }
+
+        .pill.active {
+            color: var(--text);
+            border-color: rgba(255, 255, 255, .18);
+            background: rgba(255, 255, 255, .08)
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px
+        }
+
+        .desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .toggle {
+            width: 52px;
+            height: 30px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            background: rgba(255, 255, 255, .06);
+            position: relative;
+        }
+
+        .knob {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 4px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--accentA), var(--accentB));
+        }
+
+        .toggle.on .knob {
+            left: 24px
+        }
+
+        /* Safari/Chrome: älä käytä display:none file inputille */
+        .file-input-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 64px;
+            display: flex;
+            background: rgba(5, 7, 17, .92);
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav button {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .nav button.active {
+            color: var(--text)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo">K</div>
+                <div class="brand-text">
+                    <h1>KuittiFlow</h1>
+                    <p>Paikallinen tallennus – kamera + lista (backend seuraavassa branchissa)</p>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button class="icon-btn" id="scanBtnTop" type="button" title="Skannaa">Skannaa</button>
+                <button class="icon-btn" id="resetBtn" type="button" title="Nollaa">Nollaa</button>
+            </div>
+        </header>
+
+        <input id="receiptPhotoInput" class="file-input-hidden" type="file" accept="image/*" capture="environment" />
+
+        <!-- HOME -->
+        <section class="section active" id="home">
+            <div class="card">
+                <div class="title-row">
+                    <div>
+                        <h2>Etusivu</h2>
+                        <div class="sub">Skannaa kuitti → tallennetaan paikallisesti. OCR lisätään myöhemmin.</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="grid2">
+                    <div class="kpi">
+                        <div class="label">Tämä viikko</div>
+                        <div class="value" id="kpiWeek">0,00 €</div>
+                        <div class="hint" id="kpiWeekHint">0 kuittia</div>
+                    </div>
+
+                    <div class="kpi">
+                        <div class="label">Tämä kuukausi</div>
+                        <div class="value" id="kpiMonth">0,00 €</div>
+                        <div class="hint" id="kpiMonthHint">0 kuittia</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <button class="btn-primary" id="scanBtn" type="button">Skannaa kuitti (kamera)</button>
+
+                <div class="spacer"></div>
+                <button class="btn-secondary" id="goCompareBtn" type="button">Avaa vertailu</button>
+
+                <div class="spacer"></div>
+                <div class="muted">
+                    Huom: tässä branchissa tallennus on localStorageen. Backend tehdään erillisessä branchissa.
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="card" id="photoPreviewCard" style="display:none;">
+                <div class="title-row">
+                    <div>
+                        <h2>Viimeisin skannaus</h2>
+                        <div class="sub">Kuva + tallennettu kuitti</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+                <img id="photoPreviewImg" alt="Kuitti" class="preview-img" />
+                <div class="spacer"></div>
+                <div class="muted" id="photoPreviewMeta"></div>
+            </div>
+
+            <div class="card">
+                <div class="title-row">
+                    <div>
+                        <h2>Viimeisimmät kuitit</h2>
+                        <div class="sub">Kauppa + päivä + summa (max 10)</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+                <div class="list" id="receiptList"></div>
+            </div>
+        </section>
+
+        <!-- COMPARE -->
+        <section class="section" id="compare">
+            <div class="card">
+                <div class="title-row">
+                    <div>
+                        <h2>Vertailu</h2>
+                        <div class="sub">Viikko vs viikko, tai kuukausi vs kuukausi</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="pill-row" id="compareMode">
+                    <div class="pill active" data-mode="week">Viikot</div>
+                    <div class="pill" data-mode="month">Kuukaudet</div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="grid2">
+                    <div class="kpi">
+                        <div class="label" id="leftLabel">A</div>
+                        <div class="value" id="leftValue">0,00 €</div>
+                        <div class="hint" id="leftHint">0 kuittia</div>
+                    </div>
+                    <div class="kpi">
+                        <div class="label" id="rightLabel">B</div>
+                        <div class="value" id="rightValue">0,00 €</div>
+                        <div class="hint" id="rightHint">0 kuittia</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="kpi">
+                    <div class="label">Erotus</div>
+                    <div class="value" id="diffValue">0,00 €</div>
+                    <div class="hint muted" id="diffHint">B − A</div>
+                </div>
+
+                <div class="spacer"></div>
+                <div class="muted">
+                    Tässä branchissa ei ole tuotekategorioita. Ne tulevat OCR:n kanssa.
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="section" id="settings">
+            <div class="card">
+                <div class="title-row">
+                    <div>
+                        <h2>Asetukset</h2>
+                        <div class="sub">Tallentuu laitteelle</div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="label">Nopea tila</div>
+                        <div class="desc">Skannaus → tallennus, ei automaattista hyppyä vertailuun</div>
+                    </div>
+                    <div class="toggle" id="quickModeToggle" aria-label="Nopea tila">
+                        <div class="knob"></div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <button class="btn-secondary" id="seedBtn" type="button">Lisää demodata</button>
+
+                <div class="spacer"></div>
+
+                <div class="muted">
+                    Kun flow tuntuu hyvältä puhelimessa, backend-branchissa lisätään oikea tallennus.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <nav class="nav" aria-label="Päänavigaatio">
+        <button class="active" data-target="home" type="button">Etusivu</button>
+        <button data-target="compare" type="button">Vertailu</button>
+        <button data-target="settings" type="button">Asetukset</button>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
